@@ -1,0 +1,982 @@
+﻿<process name="Utility - XML" version="1.0" narrative="Utility functions for manipulating XML" type="object" runmode="Background" preferredid="50afe2c4-6c05-44dd-92e7-a4925cfa62e0">
+  <appdef />
+  <view>
+    <camerax>0</camerax>
+    <cameray>0</cameray>
+    <zoom>1</zoom>
+  </view>
+  <preconditions />
+  <endpoint narrative="" />
+  <subsheet subsheetid="80f6917a-0130-44c3-9e26-e731a0e54b21" type="CleanUp" published="True">
+    <name>Clean Up</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom>1</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="8760ff28-2dfc-4595-952e-1784e098c0bb" type="Normal" published="True">
+    <name>Read File</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom>1</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="da647308-92ea-4cb3-9d56-cb6c53bae010" type="Normal" published="True">
+    <name>Get Attribute</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom>1</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="4472983a-4f70-49a9-adbe-8f84339fa4d9" type="Normal" published="True">
+    <name>Get Element</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom>1</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="79f4bc2b-8193-4c62-be1b-6cc0f8ebfd83" type="Normal" published="True">
+    <name>Get Elements</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom>1</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="df33ab05-d833-42e9-9902-5487f992d63e" type="Normal" published="True">
+    <name>Get Elements By XPath</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom>1</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="859d4d77-5c6d-4ceb-8d62-98c599be7517" type="Normal" published="True">
+    <name>Get Child Elements</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>-42</cameray>
+      <zoom>1</zoom>
+    </view>
+  </subsheet>
+  <subsheet subsheetid="d3eeaf9d-5380-47a6-95b0-f54d43b083e6" type="Normal" published="True">
+    <name>Strip Tags</name>
+    <view>
+      <camerax>0</camerax>
+      <cameray>0</cameray>
+      <zoom>1</zoom>
+    </view>
+  </subsheet>
+  <stage stageid="a19cb5e0-2f5a-437b-96f9-cf046d8390c5" name="Start" type="Start">
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <onsuccess>98252a38-afd4-410f-9105-85b8d5754cca</onsuccess>
+  </stage>
+  <stage stageid="98252a38-afd4-410f-9105-85b8d5754cca" name="End" type="End">
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>90</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="db9dd53d-234f-49ec-a86f-f255b8c94701" name="Stage1" type="ProcessInfo">
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>90</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <references>
+      <reference>System.Data.dll</reference>
+      <reference>System.Xml.dll</reference>
+      <reference>System.Drawing.dll</reference>
+    </references>
+    <imports>
+      <import>System</import>
+      <import>System.Drawing</import>
+      <import>System.Data</import>
+      <import>System.IO</import>
+      <import>System.XML</import>
+      <import>Microsoft.VisualBasic</import>
+      <import>System.Text.RegularExpressions</import>
+    </imports>
+    <language>visualbasic</language>
+    <globalcode><![CDATA[
+
+]]></globalcode>
+    <code><![CDATA[
+
+Public Function GetDataTable(ByVal ColumnNamesCSV As String, ByVal ColumnTypesCSV As String) As DataTable
+
+	Dim objTable As DataTable
+	Dim objColumn As DataColumn
+	Dim aColumnNames As String() = ColumnNamesCSV.Split(",")
+	Dim aColumnTypes As String() = ColumnTypesCSV.Split(",")
+
+	Try
+		objTable = New DataTable
+		For i As Integer = 0 To aColumnNames.Length - 1
+			objColumn = New DataColumn 
+			objColumn.DataType = System.Type.GetType(aColumnTypes(i).Trim)
+			objColumn.ColumnName = aColumnNames(i).Trim
+			objTable.Columns.Add(objColumn)
+		Next
+		
+	Catch e As Exception
+		objTable = nothing	
+	End Try
+
+	Return objTable
+
+End Function
+
+
+]]></code>
+  </stage>
+  <stage stageid="ee3ef258-b041-4d2e-a0c3-f15d164668cd" name="Clean Up" type="SubSheetInfo">
+    <subsheetid>80f6917a-0130-44c3-9e26-e731a0e54b21</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>90</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="0697db0a-2430-49ab-9843-c62cca14fbcb" name="Start" type="Start">
+    <subsheetid>80f6917a-0130-44c3-9e26-e731a0e54b21</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <onsuccess>9be9d134-83ed-48c5-b854-866da172fb02</onsuccess>
+  </stage>
+  <stage stageid="9be9d134-83ed-48c5-b854-866da172fb02" name="End" type="End">
+    <subsheetid>80f6917a-0130-44c3-9e26-e731a0e54b21</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>90</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="9b6f82d4-4408-41b1-bc68-7227405b7672" name="Get Attribute" type="SubSheetInfo">
+    <subsheetid>da647308-92ea-4cb3-9d56-cb6c53bae010</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>90</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="9b3a98d6-f06b-4392-abde-64afae690ba5" name="new" type="Note">
+    <subsheetid>80f6917a-0130-44c3-9e26-e731a0e54b21</subsheetid>
+    <narrative>Clean Up Page
+
+This is an optional page where you might choose to perform some finalisation (or "cleanup") tasks as your business object is closed down.
+
+The cleanup action will be called automatically immediately after closing your business object at the end of a business process.
+
+You will not be able to call this action from a business process, nor will it be called at any other time than before the disposal of the business object.</narrative>
+    <displayx>-180</displayx>
+    <displayy>60</displayy>
+    <displaywidth>180</displaywidth>
+    <displayheight>230</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="a5f93986-f40d-489e-9ba1-fd08a9cbd377" name="new" type="Note">
+    <narrative>Initialise Page
+
+This is an optional page where you might choose to perform some initialisation tasks after your business object is loaded.
+
+The initialise action will be called automatically immediately after loading your business object.
+
+You will not be able to call this action from a business process, nor will it be called at any other time than after the creation of the object.</narrative>
+    <displayx>-180</displayx>
+    <displayy>60</displayy>
+    <displaywidth>180</displaywidth>
+    <displayheight>230</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="e6aad9a0-1c02-42d1-87c2-4ec704afb85e" name="Start" type="Start">
+    <subsheetid>da647308-92ea-4cb3-9d56-cb6c53bae010</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="XML" stage="XML" />
+      <input type="text" name="Attribute Name" stage="Attribute Name" />
+    </inputs>
+    <onsuccess>1a5111a8-b8ba-4c1f-8ba0-7bde3eb73096</onsuccess>
+  </stage>
+  <stage stageid="290154f9-ff43-4fc5-b0fd-33815ae7aedf" name="End" type="End">
+    <subsheetid>da647308-92ea-4cb3-9d56-cb6c53bae010</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>90</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <outputs>
+      <output type="text" name="Value" stage="Attribute Value" />
+    </outputs>
+  </stage>
+  <stage stageid="3aea12ff-52b0-42ed-8b15-2a4d1f43753a" name="XML" type="Data">
+    <subsheetid>da647308-92ea-4cb3-9d56-cb6c53bae010</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-15</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue xml:space="preserve">&lt;iGrading&gt;&lt;Response transactionID="de3dc0b1-6b22-4b67-a13a-d42fff6188b9" status="Success" method="SubmitPotentialGradingWithImages" description="" /&gt;&lt;/iGrading&gt;</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="9626bf37-0254-4589-b5af-e6e99448e28a" name="Attribute Name" type="Data">
+    <subsheetid>da647308-92ea-4cb3-9d56-cb6c53bae010</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>15</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue xml:space="preserve">method</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="8590e2b5-308f-4d4d-bd86-d39423bd4608" name="Attribute Value" type="Data">
+    <subsheetid>da647308-92ea-4cb3-9d56-cb6c53bae010</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>45</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="1a5111a8-b8ba-4c1f-8ba0-7bde3eb73096" name="Get Attribute" type="Code">
+    <subsheetid>da647308-92ea-4cb3-9d56-cb6c53bae010</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-15</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="XML" expr="[XML]" />
+      <input type="text" name="Attribute" expr="[Attribute Name]" />
+    </inputs>
+    <outputs>
+      <output type="text" name="Value" stage="Attribute Value" />
+    </outputs>
+    <onsuccess>290154f9-ff43-4fc5-b0fd-33815ae7aedf</onsuccess>
+    <code><![CDATA[
+dim i as integer = XML.indexof(Attribute)
+
+if i > 0 then
+	i += Attribute.length + 2
+	value = XML.substring(i)
+	value = value.substring(0, value.indexof(""""))
+else
+	value = ""
+end if]]></code>
+  </stage>
+  <stage stageid="79814047-e0b8-4336-9d22-cb849c17b97d" name="Get Elements" type="SubSheetInfo">
+    <subsheetid>79f4bc2b-8193-4c62-be1b-6cc0f8ebfd83</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>90</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="bcb63f10-da65-4f36-9e6d-fdcca4d6b0fd" name="Start" type="Start">
+    <subsheetid>79f4bc2b-8193-4c62-be1b-6cc0f8ebfd83</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="XML" stage="XML" />
+      <input type="text" name="Element Name" stage="Element Name" />
+    </inputs>
+    <onsuccess>2526b4b4-e39b-4f5d-9bfb-ec1d99b09d7b</onsuccess>
+  </stage>
+  <stage stageid="fcc3d605-0e59-4266-bbb6-cfa4d17a2583" name="End" type="End">
+    <subsheetid>79f4bc2b-8193-4c62-be1b-6cc0f8ebfd83</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>90</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <outputs>
+      <output type="collection" name="Elements" stage="Elements" />
+    </outputs>
+  </stage>
+  <stage stageid="fd3f4c70-58d8-4397-9395-7cb315b7fce3" name="XML" type="Data">
+    <subsheetid>79f4bc2b-8193-4c62-be1b-6cc0f8ebfd83</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-15</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue xml:space="preserve">&lt;?xml version="1.0" encoding="utf-8" ?&gt; &lt;PotentialGrading&gt;  &lt;ServiceIdentifier&gt;ABC&lt;/ServiceIdentifier&gt;  &lt;Episode ID="a97fe424-0d1f-4e7c-9e9a-9b3c9e03d594"&gt;   &lt;Patient DateOfBirth="18/02/1970" Gender="M" PartPostcode="YO51" EthnicOrigin="W" Country="United Kingdom"    Region="North Yorkshire" RegisteredBlind="0" RegisteredPartiallySighted="1" HealthProvider="PCT"    Insurance="Cheap as Chips Insurance"&gt;The patient ID goes here&lt;/Patient&gt;   &lt;Screening Date="2007/09/06" GradingCodeSet="NGC" ImageCount="4"&gt;    &lt;Item Code="Examiner Classification" Value="1" /&gt;    &lt;Item Code="Eye Screening Urgency" Value="2" /&gt;    &lt;Item Code="Opthalmologist Care" Value="2" /&gt;    &lt;Item Code="Technical Gradability Code" Value="1" /&gt;    &lt;Item Code="01 Visual Acuity Pinhole" Value="0" Laterality="right" /&gt;    &lt;Item Code="01 Visual Acuity Pinhole" Value="0" Laterality="left" /&gt;    &lt;Item Code="02 Visual Acuity Spectacles" Value="0" Laterality="right" /&gt;    &lt;Item Code="02 Visual Acuity Spectacles" Value="0" Laterality="left" /&gt;    &lt;Item Code="03 Visual Acuity Standard" Value="1" Laterality="right" /&gt;    &lt;Item Code="03 Visual Acuity Standard" Value="1" Laterality="left" /&gt;    &lt;Item Code="04 Visual Acuity" Value="" Laterality="right"&gt;Free text entry&lt;/Item&gt;    &lt;Item Code="04 Visual Acuity" Value="" Laterality="left"&gt;Free text entry&lt;/Item&gt;    &lt;Item Code="06 Dilation" Value="1" Laterality="right" /&gt;    &lt;Item Code="06 Dilation" Value="1" Laterality="left" /&gt;    &lt;Image Length="104644" CameraID="Camera1" CameraModelID="CameraModel1" CaptureDateTime="2007/09/06T01:54:59"     Eye="L"&gt;1121017(5)L.jpg&lt;/Image&gt;    &lt;Image Length="107565" CameraID="Camera2" CameraModelID="CameraModel2" CaptureDateTime="2007/09/06T01:54:59"     Eye="L"&gt;1121017(6)L.jpg&lt;/Image&gt;    &lt;Image Length="107441" CameraID="Camera3" CameraModelID="CameraModel3" CaptureDateTime="2007/09/06T01:54:59"     Eye="R"&gt;1121017(5)R.jpg&lt;/Image&gt;    &lt;Image Length="112472" CameraID="Camera4" CameraModelID="CameraModel4" CaptureDateTime="2007/09/06T01:54:59"     Eye="R"&gt;1121017(6)R.jpg&lt;/Image&gt;   &lt;/Screening&gt;   &lt;Notes&gt;Free text notes go here&lt;/Notes&gt;  &lt;/Episode&gt; &lt;/PotentialGrading&gt; </initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="63d1352b-4761-4e40-aaf8-051de9f6be58" name="Element Name" type="Data">
+    <subsheetid>79f4bc2b-8193-4c62-be1b-6cc0f8ebfd83</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>15</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue xml:space="preserve">Image</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="2526b4b4-e39b-4f5d-9bfb-ec1d99b09d7b" name="Get Elements" type="Code">
+    <subsheetid>79f4bc2b-8193-4c62-be1b-6cc0f8ebfd83</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-15</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="XML" expr="[XML]" />
+      <input type="text" name="Element" expr="[Element Name]" />
+    </inputs>
+    <outputs>
+      <output type="collection" name="Elements" stage="Elements" />
+    </outputs>
+    <onsuccess>fcc3d605-0e59-4266-bbb6-cfa4d17a2583</onsuccess>
+    <code><![CDATA[
+dim table as datatable = GetDataTable("XML", "System.String")
+dim row as datarow
+dim doc as new xmldocument
+dim list as xmlnodelist
+
+try
+
+	doc.loadxml(xml)
+	list = doc.getelementsbytagname(element)
+
+	for each n as xmlnode in list
+		row = table.newrow()
+		row("XML") = n.outerxml
+		table.rows.Add(row)
+	next
+
+catch e as exception
+finally
+	Elements = table
+end try
+]]></code>
+  </stage>
+  <stage stageid="a9b78a27-0e27-4f57-9799-7fa7d0d480e8" name="Elements" type="Collection">
+    <subsheetid>79f4bc2b-8193-4c62-be1b-6cc0f8ebfd83</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>90</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>90</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <datatype>collection</datatype>
+    <private />
+    <alwaysinit />
+    <collectioninfo>
+      <field name="XML" type="text" />
+    </collectioninfo>
+  </stage>
+  <stage stageid="500c8db0-c451-4062-8026-a12066d2eacd" name="Get Child Elements" type="SubSheetInfo">
+    <subsheetid>859d4d77-5c6d-4ceb-8d62-98c599be7517</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>90</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="7af2c0fb-7b1c-47d2-b894-95c95b5eeb11" name="Start" type="Start">
+    <subsheetid>859d4d77-5c6d-4ceb-8d62-98c599be7517</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="XML" stage="XML" />
+    </inputs>
+    <onsuccess>58317b93-8dff-4cbc-ad5a-264e90f266b6</onsuccess>
+  </stage>
+  <stage stageid="ca9137d8-962a-4ef9-88cf-7838459e05cd" name="End" type="End">
+    <subsheetid>859d4d77-5c6d-4ceb-8d62-98c599be7517</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>90</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <outputs>
+      <output type="collection" name="Elements" stage="Elements" />
+    </outputs>
+  </stage>
+  <stage stageid="ee47a1e5-ee32-4b73-ac5a-63d5d7f3a0a4" name="XML" type="Data">
+    <subsheetid>859d4d77-5c6d-4ceb-8d62-98c599be7517</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-15</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="58317b93-8dff-4cbc-ad5a-264e90f266b6" name="Get Child Elements" type="Code">
+    <subsheetid>859d4d77-5c6d-4ceb-8d62-98c599be7517</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-15</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="XML" expr="[XML]" />
+    </inputs>
+    <outputs>
+      <output type="collection" name="Elements" stage="Elements" />
+    </outputs>
+    <onsuccess>ca9137d8-962a-4ef9-88cf-7838459e05cd</onsuccess>
+    <code><![CDATA[
+dim table as datatable = GetDataTable("XML", "System.String")
+dim row as datarow
+dim doc as new xmldocument
+
+try
+
+	doc.loadxml(xml)
+	for each n as xmlnode in doc.childnodes
+		for each nn as xmlnode in n.childnodes
+			row = table.newrow()
+			row("XML") = nn.outerxml
+			table.rows.Add(row)
+		next
+	next
+
+catch e as exception
+finally
+	Elements = table
+end try
+]]></code>
+  </stage>
+  <stage stageid="8f54f0a0-6247-485b-9442-0357e2ae5460" name="Read File" type="SubSheetInfo">
+    <subsheetid>8760ff28-2dfc-4595-952e-1784e098c0bb</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>90</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="304b8b3f-8f27-470d-9ce0-1ec0819e7b0a" name="Start" type="Start">
+    <subsheetid>8760ff28-2dfc-4595-952e-1784e098c0bb</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="Path" stage="Path" />
+    </inputs>
+    <onsuccess>a87867d0-8288-41e3-958b-b825578c6238</onsuccess>
+  </stage>
+  <stage stageid="e43ab352-c812-4f60-a78d-3f6624d361c7" name="End" type="End">
+    <subsheetid>8760ff28-2dfc-4595-952e-1784e098c0bb</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>90</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <outputs>
+      <output type="text" name="XML" stage="XML" />
+    </outputs>
+  </stage>
+  <stage stageid="08499145-66e3-43b3-94e2-f575e1f0695b" name="Path" type="Data">
+    <subsheetid>8760ff28-2dfc-4595-952e-1784e098c0bb</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-30</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="a87867d0-8288-41e3-958b-b825578c6238" name="Read File" type="Code">
+    <subsheetid>8760ff28-2dfc-4595-952e-1784e098c0bb</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-15</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="Path" expr="[Path]" />
+    </inputs>
+    <outputs>
+      <output type="text" name="XML" stage="XML" />
+    </outputs>
+    <onsuccess>e43ab352-c812-4f60-a78d-3f6624d361c7</onsuccess>
+    <code><![CDATA[
+XML = File.ReadAllText(Path)]]></code>
+  </stage>
+  <stage stageid="498e71a0-9486-4606-bd54-592cc9be52af" name="XML" type="Data">
+    <subsheetid>8760ff28-2dfc-4595-952e-1784e098c0bb</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>0</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="1072824a-9e75-4ecd-9f29-140b060c854b" name="Elements" type="Collection">
+    <subsheetid>859d4d77-5c6d-4ceb-8d62-98c599be7517</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>75</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>90</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <datatype>collection</datatype>
+    <private />
+    <alwaysinit />
+    <collectioninfo>
+      <field name="XML" type="text" />
+    </collectioninfo>
+  </stage>
+  <stage stageid="d6fa3916-1e43-4632-864c-b601b1425075" name="Get Element" type="SubSheetInfo">
+    <subsheetid>4472983a-4f70-49a9-adbe-8f84339fa4d9</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>90</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="ec07dc46-21af-44be-b98f-6c08c1341aab" name="Start" type="Start">
+    <subsheetid>4472983a-4f70-49a9-adbe-8f84339fa4d9</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="XML" stage="XML" />
+    </inputs>
+    <onsuccess>06f3cfec-6f2d-4a4d-a03f-93358c8f01d9</onsuccess>
+  </stage>
+  <stage stageid="35059544-fb11-49fd-8840-66e9aa9b54da" name="End" type="End">
+    <subsheetid>4472983a-4f70-49a9-adbe-8f84339fa4d9</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>120</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <outputs>
+      <output type="text" name="Name" stage="Name" />
+      <output type="text" name="Value" stage="Value" />
+    </outputs>
+  </stage>
+  <stage stageid="97832d34-d33a-4bc2-9e1a-e832495ccdf8" name="XML" type="Data">
+    <subsheetid>4472983a-4f70-49a9-adbe-8f84339fa4d9</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-15</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue xml:space="preserve">&lt;PenId&gt;ABC 1234&lt;/PenId&gt;</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="60341310-cbd2-4402-83ff-08904a5d105f" name="Name" type="Data">
+    <subsheetid>4472983a-4f70-49a9-adbe-8f84339fa4d9</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>15</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="cc198e02-03cf-44db-89d8-49701f934f9c" name="Value" type="Data">
+    <subsheetid>4472983a-4f70-49a9-adbe-8f84339fa4d9</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>45</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="06f3cfec-6f2d-4a4d-a03f-93358c8f01d9" name="Name" type="Calculation">
+    <subsheetid>4472983a-4f70-49a9-adbe-8f84339fa4d9</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-45</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <onsuccess>b85012c4-e048-47b4-8044-e33d78bace51</onsuccess>
+    <calculation expression="Mid([XML], 2, InStr([XML], &quot;&gt;&quot;) - 2)" stage="Name" />
+  </stage>
+  <stage stageid="b85012c4-e048-47b4-8044-e33d78bace51" name="Value" type="Calculation">
+    <subsheetid>4472983a-4f70-49a9-adbe-8f84339fa4d9</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>15</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <onsuccess>c502a32e-6fb9-42a6-ad41-9f08e7a2e88a</onsuccess>
+    <calculation expression="Mid([XML], InStr([XML], &quot;&gt;&quot;) + 1, Len([XML]))" stage="Value" />
+  </stage>
+  <stage stageid="c502a32e-6fb9-42a6-ad41-9f08e7a2e88a" name="Value" type="Calculation">
+    <subsheetid>4472983a-4f70-49a9-adbe-8f84339fa4d9</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>60</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <onsuccess>35059544-fb11-49fd-8840-66e9aa9b54da</onsuccess>
+    <calculation expression="Left([Value], InStr([Value], &quot;&lt;&quot;) - 1)" stage="Value" />
+  </stage>
+  <stage stageid="b457f3f1-a9d9-4ddd-b1c5-688333505047" name="Strip Tags" type="SubSheetInfo">
+    <subsheetid>d3eeaf9d-5380-47a6-95b0-f54d43b083e6</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>90</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="6e2f6417-27e9-4ef1-a768-2b1a2a3ed396" name="Start" type="Start">
+    <subsheetid>d3eeaf9d-5380-47a6-95b0-f54d43b083e6</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="XML" stage="XML" />
+    </inputs>
+    <onsuccess>0c91203e-20a6-4cd1-a51a-8d5b7dff72a4</onsuccess>
+  </stage>
+  <stage stageid="1831b09b-d373-4311-9ac2-d6164d9c349a" name="End" type="End">
+    <subsheetid>d3eeaf9d-5380-47a6-95b0-f54d43b083e6</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>90</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <outputs>
+      <output type="text" name="Text" stage="Text" />
+    </outputs>
+  </stage>
+  <stage stageid="7cfa61aa-1b0f-4fc7-9eeb-319e46a674f6" name="XML" type="Data">
+    <subsheetid>d3eeaf9d-5380-47a6-95b0-f54d43b083e6</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-15</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue xml:space="preserve">&lt;My Tag&gt;Hello&lt;/My Tag&gt;</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="21a495b3-eb0c-4b45-b55a-85a92a42f5cc" name="Text" type="Data">
+    <subsheetid>d3eeaf9d-5380-47a6-95b0-f54d43b083e6</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>60</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="0c91203e-20a6-4cd1-a51a-8d5b7dff72a4" name="Code1" type="Code">
+    <subsheetid>d3eeaf9d-5380-47a6-95b0-f54d43b083e6</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-15</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="XML" expr="[XML]" />
+    </inputs>
+    <outputs>
+      <output type="text" name="Text" stage="Text" />
+    </outputs>
+    <onsuccess>1831b09b-d373-4311-9ac2-d6164d9c349a</onsuccess>
+    <code><![CDATA[
+Text = Regex.Replace(XML, "<.*?>", "")
+]]></code>
+  </stage>
+  <stage stageid="6e010598-fce4-4f00-8ce8-6628922ceb75" name="Get Elements By XPath" type="SubSheetInfo">
+    <subsheetid>df33ab05-d833-42e9-9902-5487f992d63e</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>90</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+  </stage>
+  <stage stageid="573f826e-8772-4429-a3b0-fe9499b1cc8d" name="XML" type="Data">
+    <subsheetid>df33ab05-d833-42e9-9902-5487f992d63e</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>-30</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="e53b8d8d-499f-4b9a-ab51-c2cf98a83ff6" name="Path" type="Data">
+    <subsheetid>df33ab05-d833-42e9-9902-5487f992d63e</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>0</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="55e74d85-6940-4e06-b40d-6811a58d4811" name="Elements" type="Collection">
+    <subsheetid>df33ab05-d833-42e9-9902-5487f992d63e</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-195</displayx>
+    <displayy>75</displayy>
+    <displaywidth>150</displaywidth>
+    <displayheight>90</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <datatype>collection</datatype>
+    <private />
+    <alwaysinit />
+    <collectioninfo>
+      <field name="Name" type="text" />
+      <field name="Value" type="text" />
+      <field name="Inner XML" type="text" />
+      <field name="Outer XML" type="text" />
+    </collectioninfo>
+  </stage>
+  <stage stageid="08273a8c-2e84-42b2-951a-fb7084bad902" name="Start" type="Start">
+    <subsheetid>df33ab05-d833-42e9-9902-5487f992d63e</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>-15</displayx>
+    <displayy>-105</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="XML" stage="XML" />
+      <input type="text" name="Path" stage="Path" />
+    </inputs>
+    <onsuccess>3015c532-2467-4c1a-878c-d69792f0bfdd</onsuccess>
+  </stage>
+  <stage stageid="d866d40d-b960-4462-a880-250ccd59fba2" name="End" type="End">
+    <subsheetid>df33ab05-d833-42e9-9902-5487f992d63e</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>-15</displayx>
+    <displayy>90</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <outputs>
+      <output type="collection" name="Elements" stage="Elements" />
+    </outputs>
+  </stage>
+  <stage stageid="3015c532-2467-4c1a-878c-d69792f0bfdd" name="Get Elements By XPath" type="Code">
+    <subsheetid>df33ab05-d833-42e9-9902-5487f992d63e</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>-15</displayx>
+    <displayy>-15</displayy>
+    <displaywidth>180</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Tahoma" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="XML" expr="[XML]" />
+      <input type="text" name="Path" expr="[Path]" />
+    </inputs>
+    <outputs>
+      <output type="collection" name="Elements" stage="Elements" />
+    </outputs>
+    <onsuccess>d866d40d-b960-4462-a880-250ccd59fba2</onsuccess>
+    <code><![CDATA[
+dim table as datatable = GetDataTable("Name,Value,Inner XML,Outer XML", "System.String,System.String,System.String,System.String")
+dim row as datarow
+dim doc as new xmldocument
+dim list as xmlnode
+
+try
+
+	doc.loadxml(xml)
+	list = doc.SelectSingleNode(Path)
+
+	for each n as xmlnode in list.ChildNodes
+		row = table.newrow()
+		row("Name") = n.name
+		row("Value") = n.innertext
+		row("Inner XML") = n.innerxml
+		row("Outer XML") = n.outerxml
+		table.rows.Add(row)
+	next
+
+catch e as exception
+finally
+	Elements = table
+end try]]></code>
+  </stage>
+</process>

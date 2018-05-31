@@ -1,4 +1,4 @@
-﻿<process name="readEmail" version="1.0" bpversion="5.0.11.0" narrative="" type="object" runmode="Exclusive" preferredid="67b24c52-9c6f-483b-bf6a-5fc9a298f727">
+﻿<process name="readEmail" version="1.0" bpversion="5.0.34.0" narrative="" type="object" runmode="Exclusive" preferredid="67b24c52-9c6f-483b-bf6a-5fc9a298f727">
   <appdef>
     <element name="Application Root">
       <id>ff343e78-a5f1-4719-b08a-9cd9db1c60d3</id>
@@ -26,7 +26,7 @@
   <subsheet subsheetid="a8c71662-e857-4499-b0f7-8caaad8d8d95" type="Normal" published="False">
     <name>Action 1</name>
     <view>
-      <camerax>-78</camerax>
+      <camerax>-277</camerax>
       <cameray>0</cameray>
       <zoom version="2">1.25</zoom>
     </view>
@@ -144,8 +144,8 @@
     <loginhibit />
     <narrative>
     </narrative>
-    <displayx>180</displayx>
-    <displayy>165</displayy>
+    <displayx>-75</displayx>
+    <displayy>120</displayy>
     <displaywidth>60</displaywidth>
     <displayheight>30</displayheight>
     <font family="Segoe UI" size="10" style="Regular" color="000000" />
@@ -250,8 +250,8 @@ div.WordSection1
     <loginhibit />
     <narrative>
     </narrative>
-    <displayx>-210</displayx>
-    <displayy>-210</displayy>
+    <displayx>-300</displayx>
+    <displayy>-150</displayy>
     <displaywidth>60</displaywidth>
     <displayheight>30</displayheight>
     <font family="Segoe UI" size="10" style="Regular" color="000000" />
@@ -413,7 +413,7 @@ Coll2 = table1;
     <datatype>collection</datatype>
     <private />
     <collectioninfo>
-      <field name="Column Names" type="text" />
+      <field name="Column Names" type="text" namespace="" />
     </collectioninfo>
     <initialvalue>
       <row>
@@ -423,10 +423,10 @@ Coll2 = table1;
         <field name="Column Names" type="text" value="Scheme Name" />
       </row>
       <row>
-        <field name="Column Names" type="text" value="Fund Name" />
+        <field name="Column Names" type="text" value="ISIN" />
       </row>
       <row>
-        <field name="Column Names" type="text" value="ISIN" />
+        <field name="Column Names" type="text" value="Fund Name" />
       </row>
     </initialvalue>
     <noalwaysinit />
@@ -450,43 +450,225 @@ Coll2 = table1;
     <loginhibit />
     <narrative>
     </narrative>
-    <displayx>-210</displayx>
-    <displayy>-45</displayy>
+    <displayx>-300</displayx>
+    <displayy>-90</displayy>
     <displaywidth>60</displaywidth>
     <displayheight>30</displayheight>
     <font family="Segoe UI" size="10" style="Regular" color="000000" />
     <inputs>
       <input type="collection" name="colNameList" expr="[Coll1]" />
       <input type="collection" name="Coll2" expr="[Coll2]" />
+      <input type="collection" name="output" expr="[output]" />
     </inputs>
-    <onsuccess>e9648331-ef49-40ba-8089-aa1545342589</onsuccess>
+    <outputs>
+      <output type="collection" name="mapped" stage="Mapping" />
+      <output type="collection" name="nomappingtable" stage="nomappingtable" />
+      <output type="collection" name="outTable" stage="outTable" />
+    </outputs>
+    <onsuccess>f33bc90e-2674-48af-8f9a-5d9d0ee1ec95</onsuccess>
     <code><![CDATA[DataTable table1 = colNameList;
 DataTable table2 = Coll2;
 
+DataTable nomapping = new DataTable();
+
+DataTable mapping = new DataTable();
+
+nomapping.Columns.Add("input", typeof(int));
+mapping.Columns.Add("input", typeof(int));
+mapping.Columns.Add("check", typeof(int));
 
 bool exists;
+bool allExists = true;
 
+int inputnum =0;
+int checknum =0; 
 
 foreach(DataRow dr in table1.Rows)
 {	
+	checknum++;
+	inputnum =0;
 	exists = false;
 	string a = System.Text.RegularExpressions.Regex.Replace(dr["Column Names"].ToString(), @"\s", "");
 	foreach (DataRow de in table2.Select("rownum=1"))
-	{		
+	{	
+		inputnum++;	
 		string b = System.Text.RegularExpressions.Regex.Replace(de["data"].ToString(), @"\s", "");		
 		exists = b.ToLower().Contains(a.ToLower());
 		
-		if (exists==true){break;}
+		if (exists==true){
+			mapping.Rows.Add(inputnum,checknum);
+			break;}
 		
 		
 	}
 	if (exists== false){		
-		MessageBox.Show("False");
+		allExists = false;
+		MessageBox.Show("false");
 		break;
 	}
+
+}	
+
+mapped = mapping;
+
+inputnum = 0;
+foreach(DataRow dr in table2.Select("rownum=1")){
+	exists = false;
+	inputnum++;
+	foreach (DataRow de in mapping.Rows){
+		
+		if (de["input"].ToString() == dr["colnum"].ToString()){
+			exists = true;
+			break;			
+			}		
+		}
 	
-	//MessageBox.Show(dr["Column Names"].ToString());
-}		
+	if 	(exists == false){
+		nomapping.Rows.Add(inputnum);
+	}	
+	
+	
+	
+	
+	}
+
+nomappingtable = nomapping;
+
+foreach(DataRow dr in nomappingtable.Rows){
+	DataRow[] rows;
+	rows = table2.Select("colnum = "+dr["input"]);
+	foreach (DataRow row in rows)
+     table2.Rows.Remove(row);
+	
+}
+
+
+
+//remove not needed columns
+
+
+
+
+
+foreach(DataRow de in table2.Rows)
+{
+	exists = false;
+	
+	foreach (DataRow dr in mapping.Rows)
+	{
+		
+		if (dr["input"].ToString()==de["colnum"].ToString())
+		{
+			exists = true;
+			break;		
+		}
+	}
+	
+	if (exists==false)
+	{
+		//de.Delete();
+		
+	}
+	
+	
+	
+
+}
+
+table2.Columns.Remove("colnum");
+
+
+
+int maxRowNum = Convert.ToInt32(table2.Compute("max([rownum])", string.Empty));
+
+
+//MessageBox.Show(maxRowNum.ToString());
+
+
+foreach(DataRow dr in output.Rows)
+{	
+	exists = false;
+	string a = System.Text.RegularExpressions.Regex.Replace(dr["OutputNames"].ToString(), @"\s", "");
+	
+	foreach (DataRow de in table1.Rows)
+	{	
+		
+		string b = System.Text.RegularExpressions.Regex.Replace(de["Column Names"].ToString(), @"\s", "");		
+		
+		
+		if (string.Compare(a.ToLower(), b.ToLower(), true) == 0){	
+			exists = true;
+			break;
+		}	
+		
+	}
+
+	if (exists == false){	
+		
+		// add these rows into input
+		//MessageBox.Show(table2.Select("rownum = "+1)[0]["td"].ToString());
+		
+		table2.Rows.Add(1,table2.Select("rownum = "+1)[0]["td"],table2.Select("rownum = "+1)[0]["pdata"],dr["OutputNames"].ToString());
+		
+		for (int i = 2;i<= maxRowNum; i++){
+			
+			table2.Rows.Add(i,table2.Select("rownum = "+1)[0]["td"],table2.Select("rownum = "+1)[0]["pdata"],"");
+
+			
+			
+		}
+		
+		
+		
+		
+		
+		
+	}
+
+
+
+
+}
+
+
+
+
+
+
+outTable = table2;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -516,7 +698,7 @@ foreach(DataRow dr in table1.Rows)
     <private />
     <alwaysinit />
     <collectioninfo>
-      <field name="Field1" type="text" />
+      <field name="Field1" type="text" namespace="" />
     </collectioninfo>
     <initialvalue>
       <row>
@@ -535,5 +717,238 @@ foreach(DataRow dr in table1.Rows)
         <field name="Field1" type="text" value="" />
       </row>
     </initialvalue>
+  </stage>
+  <stage stageid="e1132591-9e57-43c1-9e9d-2a20bfb8edc1" name="Mapping" type="Collection">
+    <subsheetid>a8c71662-e857-4499-b0f7-8caaad8d8d95</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>-495</displayx>
+    <displayy>-30</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>collection</datatype>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="ffc1ba9c-e46c-4a7c-897c-5d44f273bebd" name="output" type="Collection">
+    <subsheetid>a8c71662-e857-4499-b0f7-8caaad8d8d95</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>-405</displayx>
+    <displayy>0</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>collection</datatype>
+    <private />
+    <alwaysinit />
+    <collectioninfo>
+      <field name="OutputNames" type="text" namespace="" />
+    </collectioninfo>
+    <initialvalue>
+      <row>
+        <field name="OutputNames" type="text" value="Sl.No" />
+      </row>
+      <row>
+        <field name="OutputNames" type="text" value="Scheme Name" />
+      </row>
+      <row>
+        <field name="OutputNames" type="text" value="Fund Name" />
+      </row>
+      <row>
+        <field name="OutputNames" type="text" value="ISIN" />
+      </row>
+      <row>
+        <field name="OutputNames" type="text" value="Result1" />
+      </row>
+      <row>
+        <field name="OutputNames" type="text" value="Result2" />
+      </row>
+      <row>
+        <field name="OutputNames" type="text" value="Result3" />
+      </row>
+    </initialvalue>
+  </stage>
+  <stage stageid="850f028c-648f-4068-9dba-c46c2c9595a7" name="nomappingtable" type="Collection">
+    <subsheetid>a8c71662-e857-4499-b0f7-8caaad8d8d95</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>-720</displayx>
+    <displayy>-15</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>collection</datatype>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="811f2d07-37aa-4649-957b-4078830ed57d" name="outTable" type="Collection">
+    <subsheetid>a8c71662-e857-4499-b0f7-8caaad8d8d95</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>-645</displayx>
+    <displayy>-180</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>collection</datatype>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="f33bc90e-2674-48af-8f9a-5d9d0ee1ec95" name="Code3" type="Code">
+    <subsheetid>a8c71662-e857-4499-b0f7-8caaad8d8d95</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>-300</displayx>
+    <displayy>-30</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="collection" name="outTable" expr="[outTable]" />
+      <input type="text" name="tableParams" expr="[tableParams]" />
+    </inputs>
+    <outputs>
+      <output type="text" name="outMail" stage="outMail" />
+    </outputs>
+    <onsuccess>6ae7b3ab-9ca3-489f-9e5f-cb6b90f3ba38</onsuccess>
+    <code><![CDATA[DataTable table1 = outTable;
+
+String x;
+String y = "";
+
+x = "";
+
+int maxRowNum = Convert.ToInt32(table1.Compute("max([rownum])", string.Empty));
+
+for (int i=1; i<=maxRowNum; i++ )
+{	
+	x="";
+	foreach(DataRow dr in table1.Select("rownum="+i))
+	{
+		x = x + dr["td"] + dr["pdata"] + dr["data"] + "</p></td>";
+		
+		
+	}	
+	y = y+ "<tr>"+x+"</tr>";
+	
+}
+
+
+x = tableParams + y+ "</table>";
+
+
+
+
+
+
+
+
+outMail=x;]]></code>
+  </stage>
+  <stage stageid="ff78f64e-b1d4-4207-811e-9de634f9c084" name="outMail" type="Data">
+    <subsheetid>a8c71662-e857-4499-b0f7-8caaad8d8d95</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>105</displayx>
+    <displayy>-135</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="6ae7b3ab-9ca3-489f-9e5f-cb6b90f3ba38" name="Action1" type="Action">
+    <subsheetid>a8c71662-e857-4499-b0f7-8caaad8d8d95</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>-75</displayx>
+    <displayy>-75</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="text" name="ProfileName" expr="&quot;Outlook&quot;" />
+    </inputs>
+    <outputs>
+      <output type="number" name="handle" stage="handle" />
+    </outputs>
+    <onsuccess>72a0c0ab-7bff-44b5-baea-7d753dae5c50</onsuccess>
+    <resource object="MS Outlook VBO" action="Create Instance" />
+  </stage>
+  <stage stageid="ac61732f-bd05-41d7-880e-221638692a9b" name="handle" type="Data">
+    <subsheetid>a8c71662-e857-4499-b0f7-8caaad8d8d95</subsheetid>
+    <narrative>
+    </narrative>
+    <displayx>15</displayx>
+    <displayy>-150</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>number</datatype>
+    <initialvalue />
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="d9c86b8c-16d8-4a4a-b926-cad16d7b7609" name="tmp" type="Data">
+    <subsheetid>a8c71662-e857-4499-b0f7-8caaad8d8d95</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>120</displayx>
+    <displayy>-45</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <datatype>text</datatype>
+    <initialvalue xml:space="preserve">&lt;table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 style='border-collapse:collapse'&gt;&lt;tr&gt;&lt;td width=111 valign=top style='width:93.5pt;border:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;Sl.No&lt;/p&gt;&lt;/td&gt;&lt;td width=114 valign=top style='width:93.5pt;border:solid windowtext 1.0pt;border-left:none;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;Scheme name&lt;/p&gt;&lt;/td&gt;&lt;td width=112 valign=top style='width:93.5pt;border:solid windowtext 1.0pt;border-left:none;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;Fund name&lt;/p&gt;&lt;/td&gt;&lt;td width=117 valign=top style='width:93.5pt;border:solid windowtext 1.0pt;border-left:none;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;ISIN&lt;/p&gt;&lt;/td&gt;&lt;td width=111 valign=top style='width:93.5pt;border:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;Result1&lt;/p&gt;&lt;/td&gt;&lt;td width=111 valign=top style='width:93.5pt;border:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;Result2&lt;/p&gt;&lt;/td&gt;&lt;td width=111 valign=top style='width:93.5pt;border:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;Result3&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=111 valign=top style='width:93.5pt;border:solid windowtext 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;1&lt;/p&gt;&lt;/td&gt;&lt;td width=114 valign=top style='width:93.5pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;Test Scheme 1&lt;/p&gt;&lt;/td&gt;&lt;td width=112 valign=top style='width:93.5pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;&lt;/p&gt;&lt;/td&gt;&lt;td width=117 valign=top style='width:93.5pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;&lt;/p&gt;&lt;/td&gt;&lt;td width=111 valign=top style='width:93.5pt;border:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;&lt;/p&gt;&lt;/td&gt;&lt;td width=111 valign=top style='width:93.5pt;border:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;&lt;/p&gt;&lt;/td&gt;&lt;td width=111 valign=top style='width:93.5pt;border:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=111 valign=top style='width:93.5pt;border:solid windowtext 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;2&lt;/p&gt;&lt;/td&gt;&lt;td width=114 valign=top style='width:93.5pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;Test Scheme 2&lt;/p&gt;&lt;/td&gt;&lt;td width=112 valign=top style='width:93.5pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;&lt;/p&gt;&lt;/td&gt;&lt;td width=117 valign=top style='width:93.5pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;&lt;/p&gt;&lt;/td&gt;&lt;td width=111 valign=top style='width:93.5pt;border:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;&lt;/p&gt;&lt;/td&gt;&lt;td width=111 valign=top style='width:93.5pt;border:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;&lt;/p&gt;&lt;/td&gt;&lt;td width=111 valign=top style='width:93.5pt;border:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td width=111 valign=top style='width:93.5pt;border:solid windowtext 1.0pt;border-top:none;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;3&lt;/p&gt;&lt;/td&gt;&lt;td width=114 valign=top style='width:93.5pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;&lt;/p&gt;&lt;/td&gt;&lt;td width=112 valign=top style='width:93.5pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;&lt;/p&gt;&lt;/td&gt;&lt;td width=117 valign=top style='width:93.5pt;border-top:none;border-left:none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;FBIT01234&lt;/p&gt;&lt;/td&gt;&lt;td width=111 valign=top style='width:93.5pt;border:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;&lt;/p&gt;&lt;/td&gt;&lt;td width=111 valign=top style='width:93.5pt;border:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;&lt;/p&gt;&lt;/td&gt;&lt;td width=111 valign=top style='width:93.5pt;border:solid windowtext 1.0pt;padding:0cm 5.4pt 0cm 5.4pt'&gt;&lt;p class=MsoNormal&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</initialvalue>
+    <private />
+    <alwaysinit />
+  </stage>
+  <stage stageid="72a0c0ab-7bff-44b5-baea-7d753dae5c50" name="Action2" type="Action">
+    <subsheetid>a8c71662-e857-4499-b0f7-8caaad8d8d95</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>-75</displayx>
+    <displayy>-15</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <outputs>
+      <output type="number" name="handle" stage="handle" />
+    </outputs>
+    <onsuccess>5dd3ce22-4f8f-4359-a500-257233bf0c13</onsuccess>
+    <resource object="MS Outlook VBO" action="Attach Instance" />
+  </stage>
+  <stage stageid="5dd3ce22-4f8f-4359-a500-257233bf0c13" name="Action3" type="Action">
+    <subsheetid>a8c71662-e857-4499-b0f7-8caaad8d8d95</subsheetid>
+    <loginhibit />
+    <narrative>
+    </narrative>
+    <displayx>-75</displayx>
+    <displayy>45</displayy>
+    <displaywidth>60</displaywidth>
+    <displayheight>30</displayheight>
+    <font family="Segoe UI" size="10" style="Regular" color="000000" />
+    <inputs>
+      <input type="number" name="handle" expr="[handle]" />
+      <input type="text" name="TO" expr="&quot;RDA002@group.intranet&quot;" />
+      <input type="text" name="CC" expr="" />
+      <input type="text" name="Email Subject" expr="" />
+      <input type="text" name="Message" expr="[outMail]" />
+      <input type="text" name="AttachmentFilePath" expr="" />
+    </inputs>
+    <onsuccess>e9648331-ef49-40ba-8089-aa1545342589</onsuccess>
+    <resource object="MS Outlook VBO" action="Create New HTML Mail Item" />
   </stage>
 </process>
